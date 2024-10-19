@@ -1,94 +1,90 @@
 #include <iostream>
-#include <string.h>
+#include <string>
 
 using namespace std;
 
-void decode(){
+// Function to perform Caesar Cipher encoding
+string caesarCipher(string str, long long key, bool encode) {
+    string result;
+    for (char ch : str) {
+        char base = isupper(ch) ? 'A' : (islower(ch) ? 'a' : ch);
+        if (isalpha(ch)) {
+            int offset = encode ? key : -key; // Determine whether to encode or decode
+            char newChar = (ch - base + offset + 26) % 26 + base; // Wrap around using modulo
+            result += newChar;
+        } else {
+            result += ch; // Non-alphabetic characters remain unchanged
+        }
+    }
+    return result;
+}
+
+// Function to decode the input string
+void decode() {
     string in_str;
     cout << "Enter the string to decode: ";
     cin >> in_str;
-    bool isKey = false;
+
     char check;
-    cout << "Do you have a key?(Y/n): ";
+    cout << "Do you have a key? (Y/n): ";
     cin >> check;
-    if(check == 'y' || check == 'Y') isKey = true;
-    if(isKey){
+
+    if (tolower(check) == 'y') {
         long long key;
         cout << "Enter key for decryption: ";
         cin >> key;
-        if(key < 0) {cout << "Key has to be positive!" << endl; return;}
-        string str = in_str;
-        for(long long i = 0; i < (long long)str.length(); i++){
-            if(str[i] <= 'Z' && str[i] >= 'A'){
-                long long t = (long long) str[i] - key;
-                if(t < 'A') str[i] = 'Z' + 1 - ('A'-t)%26;
-                else str[i] = t;
-            }
-            else if(str[i] <= 'z' && str[i] >= 'a'){
-                long long t = (long long) str[i] - key;
-                if(t < 'a') str[i] = 'z' + 1 - ('a'-t)%26;
-                else str[i] = t;
-            }
-            else continue;
+
+        if (key < 0) {
+            cout << "Key has to be positive!" << endl;
+            return;
         }
-    }
-    else{
+        cout << "Decoded string is --> " << caesarCipher(in_str, key, false) << endl;
+    } else {
         cout << "Bruteforcing all 26 combinations..." << endl;
-        long long key = 0;
-        while(key < 26){
-            string str = in_str;
-            for(long long i = 0; i < (long long)str.length(); i++){
-                if(str[i] <= 'Z' && str[i] >= 'A'){
-                    long long t = (long long) str[i] - key;
-                    if(t < 'A') str[i] = 'Z' + 1 - ('A'-t)%26;
-                    else str[i] = t;
-                }
-                else if(str[i] <= 'z' && str[i] >= 'a'){
-                    long long t = (long long) str[i] - key;
-                    if(t < 'a') str[i] = 'z' + 1 - ('a'-t)%26;
-                    else str[i] = t;
-                }
-                else continue;
-            }
-            cout << "Key " << key << " --> " << str << endl;
-            key++;
+        for (long long key = 0; key < 26; key++) {
+            cout << "Key " << key << " --> " << caesarCipher(in_str, key, false) << endl;
         }
     }
 }
 
-void encode(){
+// Function to encode the input string
+void encode() {
     string str;
     cout << "Enter the string to encode: ";
     cin >> str;
+
     long long key;
     cout << "Enter key for encryption: ";
     cin >> key;
-    if(key < 0) {cout << "Key has to be positive!" << endl; return;}
-    for(long long i = 0; i < (long long)str.length(); i++){
-        if(str[i] <= 'Z' && str[i] >= 'A'){
-            long long t = (long long) str[i] + key;
-            if(t > 'Z') str[i] = 'A' - 1 + (t-'Z')%26;
-            else str[i] = t;
-        }
-        else if(str[i] <= 'z' && str[i] >= 'a'){
-            long long t = (long long) str[i] + key;
-            if(t > 'z') str[i] = 'a' - 1 + (t-'z')%26;
-            else str[i] = t;
-        }
-        else continue;
+
+    if (key < 0) {
+        cout << "Key has to be positive!" << endl;
+        return;
     }
-    cout << "Encoded string is --> " << str << endl;
+
+    cout << "Encoded string is --> " << caesarCipher(str, key, true) << endl;
 }
- 
-int main(){
+
+// Main function
+int main() {
     cout << "Caesar Cipher Encoder and Decoder" << endl;
     long long option;
-    cout << "Modes:\n1.Decode\n2.Encode\n3.Exit\nChosen Mode: ";
+    cout << "Modes:\n1. Decode\n2. Encode\n3. Exit\nChosen Mode: ";
     cin >> option;
-    if(option == 1) decode();
-    else if(option == 2) encode();
-    else if(option == 3){
-        cout << "Thanks for using! Exiting now." << endl;
+
+    switch (option) {
+        case 1:
+            decode();
+            break;
+        case 2:
+            encode();
+            break;
+        case 3:
+            cout << "Thanks for using! Exiting now." << endl;
+            break;
+        default:
+            cout << "Invalid option! Please choose 1, 2, or 3." << endl;
     }
+    
     return 0;
 }
